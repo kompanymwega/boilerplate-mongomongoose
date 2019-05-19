@@ -11,13 +11,19 @@
 // Add `mongodb` and `mongoose` to the project's `package.json`. Then require 
 // `mongoose`. Store your **mLab** database URI in the private `.env` file 
 // as `MONGO_URI`. Connect to the database using `mongoose.connect(<Your URI>)`
-
+const mongoDb = require('mongodb');
+const mongoose = require('mongoose');
+let url = process.env.MONGO_URI;
+mongoose.connect(url,{useNewUrlParser: true}, function(error){
+  if(!error){
+  console.log('Hurray...No errors...Connected to Atlas db in realtime!!!')}
+return error});
 
 /** # SCHEMAS and MODELS #
 /*  ====================== */
 
 /** 2) Create a 'Person' Model */
-
+const Schema = mongoose.Schema;
 // First of all we need a **Schema**. Each schema maps to a MongoDB collection
 // and defines the shape of the documents within that collection. Schemas are
 // building block for Models. They can be nested to create complex models,
@@ -31,14 +37,31 @@
 // name : string [required]
 // age :  number
 // favoriteFoods : array of strings (*)
-
+const PersonSchema = new Schema({
+  name: {type: String, required: true},
+  age:{type: Number},
+  favoriteFoods: [String]
+})
 // Use the mongoose basic *schema types*. If you want you can also add more
 // fields, use simple validators like `required` or `unique`, and set
 // `default` values. See the [mongoose docs](http://mongoosejs.com/docs/guide.html).
 
 // <Your code here >
 
-var Person /* = <Your Model> */
+const Person = mongoose.model('Person', PersonSchema);
+
+
+
+const createAndsavePerson = function(done){
+  const human = new Person({name : 'Steve Johnson',age: 24,favoriteFoods:['chicken', 'pie', 'cucumber']});
+  human.save((err,data,done)=>{
+    if(err){
+      return done(err);
+    };
+    return done(null, data);
+    console.log(data);
+  });
+};
 
 // **Note**: GoMix is a real server, and in real servers interactions with
 // the db are placed in handler functions, to be called when some event happens
